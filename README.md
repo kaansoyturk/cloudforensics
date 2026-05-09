@@ -8,11 +8,22 @@ Bir güvenlik ihlali sonrası AWS CloudTrail loglarını toplayıp analiz eder, 
 
 ## Modüller
 
-- Evidence Collector — CloudTrail ve IAM snapshot toplama
+- Evidence Collector — CloudTrail, IAM snapshot ve S3 bucket analizi
 - Timeline Builder — Olayları zamana göre sıralama ve şüpheli aktivite tespiti
 - IP Investigator — Kaynak IP'leri araştırma, VPN/Proxy/Datacenter tespiti
 - Threat Analyzer — MITRE ATT&CK saldırı pattern tespiti, brute force, gece yarısı aktivite
 - Report Generator — Profesyonel PDF forensics raporu
+
+## Özellikler
+
+- 13 AWS bölgesini tek seferde tarama
+- CloudTrail log analizi
+- IAM kullanıcı ve rol snapshot
+- S3 bucket güvenlik analizi
+- IP threat intelligence
+- MITRE ATT&CK pattern eşleştirme
+- Brute force ve gece yarısı aktivite tespiti
+- Profesyonel PDF rapor
 
 ## Tespit Edilen Tehditler
 
@@ -23,12 +34,12 @@ Bir güvenlik ihlali sonrası AWS CloudTrail loglarını toplayıp analiz eder, 
 - Impact (bucket ve veritabanı silme)
 - Brute Force saldırıları
 - Gece yarısı kritik aktiviteler
-- Şüpheli IP aktiviteleri (VPN, Proxy, Tor)
+- Şüpheli IP aktiviteleri (VPN, Proxy, Tor, Datacenter)
 
 ## Teknolojiler
 
 - Python 3
-- boto3 — AWS CloudTrail API
+- boto3 — AWS CloudTrail, IAM, S3 API
 - reportlab — PDF rapor
 - requests — IP araştırma
 - colorama — Renkli terminal
@@ -51,13 +62,17 @@ Bir güvenlik ihlali sonrası AWS CloudTrail loglarını toplayıp analiz eder, 
 
 ## Kullanim
 
-Son 24 saat:
+Son 24 saat (tek bölge):
 
     python3 main.py
 
-Son 7 gun:
+Son 7 gun (tek bölge):
 
     python3 main.py 168
+
+Son 7 gun (tum bölgeler):
+
+    python3 main.py 168 --all-regions
 
 Son 30 gun:
 
@@ -65,21 +80,27 @@ Son 30 gun:
 
 ## Ornek Cikti
 
-    [1/5] CloudTrail kanıtları toplanıyor...
-      ✓ 25 olay toplandı
+    [1/6] CloudTrail kanıtları toplanıyor...
+      ✓ us-east-1: 200 olay
+      ✓ eu-central-1: 39 olay
+      ✓ 439 olay toplandı
 
-    [2/5] Zaman çizelgesi oluşturuluyor...
-      ✓ Şüpheli olaylar: 3 kritik, 7 yüksek
+    [2/6] IAM snapshot alınıyor...
+      ✓ 1 kullanıcı, 0 rol tespit edildi
 
-    [3/5] IP adresleri araştırılıyor...
+    [3/6] S3 bucket'ları analiz ediliyor...
+      ✓ 0 bucket tespit edildi
+
+    [4/6] Zaman çizelgesi oluşturuluyor...
+      ✓ Şüpheli: 0 kritik, 7 yüksek
+
+    [5/6] IP adresleri araştırılıyor...
       ⚠ Şüpheli IP: 185.220.101.45 — Tor Exit Node
 
-    [4/5] Tehdit analizi yapılıyor...
+    [6/6] Tehdit analizi ve rapor oluşturuluyor...
       🚨 Risk Skoru: 75/100 — HIGH
       🚨 Saldırı Pattern: Defense Evasion
-
-    [5/5] Forensics raporu oluşturuluyor...
-      ✓ PDF rapor: reports/forensics_report.pdf
+      🚨 Tehlikeye girmiş hesap: root
 
 ## Gelistirici
 
